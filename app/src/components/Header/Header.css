@@ -1,0 +1,23 @@
+.app-header {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-actions {
+  /* margin-left: 12px; */
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+

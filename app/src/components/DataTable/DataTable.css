@@ -1,0 +1,53 @@
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-primary, #fff);
+}
+
+.data-table th,
+.data-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+.data-table th {
+  background: #f4f6f8;
+  font-weight: 600;
+}
+
+.status {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status.pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status.in-progress {
+  background: #cce5ff;
+  color: #004085;
+}
+
+.status.closed {
+  background: #d4edda;
+  color: #155724;
+}
+
+.action-btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background: #0070f3;
+  color: white;
+  font-size: 13px;
+}
+
+.action-btn:hover {
+  opacity: 0.9;
+}
