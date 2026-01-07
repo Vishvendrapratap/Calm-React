@@ -1,0 +1,75 @@
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #ffffff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+  font-size: 14px;
+}
+
+.data-table thead {
+  background: var(--color-secondary);
+  color: white;
+}
+
+.data-table th {
+  padding: 14px;
+  text-align: left;
+  font-weight: 600;
+}
+
+.data-table td {
+  padding: 14px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.data-table tr:last-child td {
+  border-bottom: none;
+}
+
+.data-table tbody tr:hover {
+  background: #f9fafb;
+  transition: background 0.2s ease;
+}
+
+.data-table td:nth-child(2) {
+  font-weight: 600;
+}
+
+.data-table td:nth-child(2).available {
+  color: #059669;
+}
+
+.data-table td:nth-child(2).closed {
+  color: #dc2626;
+}
+
+.action-btn {
+  padding: 8px 14px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.action-btn:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.action-btn:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+  .data-table th,
+  .data-table td {
+    padding: 10px;
+    font-size: 13px;
+  }
+}

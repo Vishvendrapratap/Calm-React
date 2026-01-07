@@ -1,0 +1,66 @@
+.profile-menu {
+  position: relative;
+    display: inline-block;
+
+}
+
+.profile-trigger {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  background-color: transparent;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+ 
+ 
+}
+
+.profile-trigger:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.profile-dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  min-width: 160px;
+  background-color: var(--color-bg-main);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+  padding: 6px 0px;
+  z-index: 100;
+}
+
+.profile-item {
+  width: 100%;
+  padding: 10px 14px;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+}
+
+.profile-item:hover {
+  background-color: var(--color-bg-section, #f1f5f9);
+}
+
+.profile-divider {
+  height: 5px;
+  margin: 6px 0;
+  background-color: var(--color-border);
+}
+
+.profile-item.danger {
+  color: #b91c1c;
+}
+
+.profile-item.danger:hover {
+  background-color: rgba(185, 28, 28, 0.1);
+}

@@ -4,9 +4,10 @@ import { useRouter, usePathname } from 'next/navigation';
 import './Sidebar.css';
 
 const menuItems = [
-  { label: 'Dashboard', path: '/admin' },
-  { label: 'Category2', path: '/admin/category2' },
-  { label: 'Category3', path: '/admin/category3' },
+  { label: 'Dashboard', path: '/dashboard' },
+  { label: 'Inquiry', path: '/inquiry' },
+  { label: 'Services', path: '/users' },
+  { label: 'Settings', path: '/settings' },
 ];
 
 const Sidebar = () => {
@@ -25,13 +26,13 @@ const Sidebar = () => {
 
       {isOpen && (
         <>
-          <h3 className="sidebar-title">Admin</h3>
+          <h3 className="sidebar-title">User</h3>
           <ul>
             {menuItems.map((item) => (
               <li
                 key={item.label}
                 className={`sidebar-item ${
-                  pathname === item.path ? 'active ' : ''
+                  pathname === item.path ? 'active' : ''
                 }`}
                 onClick={() => router.push(item.path)}
               >

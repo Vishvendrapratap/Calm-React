@@ -1,0 +1,92 @@
+.inquiry-page {
+  display: flex;
+  flex-direction: column;
+}
+
+.inquiry-page h2 {
+  margin-bottom: 6px;
+}
+
+.inquiry-subtitle {
+  color: #6b7280;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+/* Beautiful form layout */
+.inquiry-form-dashboard {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+  max-width: 900px;
+  background: #ffffff;
+  padding: 28px;
+  border-radius: 12px;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+}
+
+/* Full-width fields */
+.inquiry-form-dashboard .field-row:nth-child(3n),
+.field-row textarea,
+.field-row input[type="file"] {
+  grid-column: span 2;
+}
+
+.field-row {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.field-row label {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.field-row input,
+.field-row select,
+.field-row textarea {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+  background: white;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.field-row input:focus,
+.field-row textarea:focus,
+.field-row select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.submit-btn-dashboard {
+  grid-column: span 2;
+  padding: 14px 20px;
+  background: #2563eb;
+  color: white;
+  font-size: 15px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  width: fit-content;
+}
+
+.submit-btn-dashboard:hover {
+  background: #1e40af;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .inquiry-form-dashboard {
+    grid-template-columns: 1fr;
+    padding: 20px;
+  }
+
+  .submit-btn-dashboard {
+    grid-column: span 1;
+  }
+}
