@@ -11,8 +11,8 @@
 
 .admin-content {
   flex: 1;
-  padding: 2px;
-  padding-top: 1px;
+  padding: 24px;
+  padding-top: 16px;
   overflow-y: auto;
 }
 

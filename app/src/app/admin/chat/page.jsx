@@ -20,7 +20,7 @@ export default function ChatPage() {
 
     return (
         <div>
-            <main className="admin-content chat-page">
+            <main className=" chat-page">
 
                 <div className={`chat-container ${selectedChat ? "chat-open" : ""}`}>
 
