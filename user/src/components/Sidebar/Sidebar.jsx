@@ -6,7 +6,7 @@ import './Sidebar.css';
 const menuItems = [
   { label: 'Dashboard', path: '/dashboard' },
   { label: 'Inquiry', path: '/inquiry' },
-  { label: 'Services', path: '/users' },
+  { label: 'Services', path: '/services' },
   { label: 'Settings', path: '/settings' },
 ];
 

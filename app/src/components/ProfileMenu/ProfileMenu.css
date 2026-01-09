@@ -1,25 +1,7 @@
-/* .profile-button {
-  padding: 8px 12px;
-  border-radius: 6px;
-  border: 1px solid var(--color-border);
-  background-color: transparent;
-  color: white;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.profile-button:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-} */
-
-
-
-
 .profile-menu {
   position: relative;
     display: inline-block;
-
+    z-index: auto;
 }
 
 .profile-trigger {
@@ -32,7 +14,6 @@
   font-size: 14px;
   font-weight: 500;
  
- 
 }
 
 .profile-trigger:hover {
@@ -40,17 +21,16 @@
 }
 
 .profile-dropdown {
-  position: absolute;
+   position: absolute;
+  top: 40px;
   right: 0;
-  top: calc(100% + 8px);
-  min-width: 160px;
-  background-color: var(--color-bg-main);
-  border: 1px solid var(--color-border);
+  width: 180px;
+  background: white;
   border-radius: 8px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
-  padding: 6px 0px;
-  z-index: 100;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  z-index: 3000; 
 }
+
 
 .profile-item {
   width: 100%;
@@ -81,4 +61,16 @@
 
 .profile-item.danger:hover {
   background-color: rgba(185, 28, 28, 0.1);
+}
+
+
+
+@media (max-width: 768px) {
+  .profile-dropdown {
+    position: fixed;   /* FULLY FLOAT above layout */
+    top: 60px;         /* below header */
+    right: 16px;
+    width: 200px;
+    z-index: 3000 !important;
+  }
 }

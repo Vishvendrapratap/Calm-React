@@ -13,7 +13,6 @@
   font-size: 14px;
 }
 
-/* Beautiful form layout */
 .inquiry-form-dashboard {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -25,7 +24,6 @@
   box-shadow: 0 4px 18px rgba(0,0,0,0.08);
 }
 
-/* Full-width fields */
 .inquiry-form-dashboard .field-row:nth-child(3n),
 .field-row textarea,
 .field-row input[type="file"] {
@@ -79,7 +77,6 @@
   background: #1e40af;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .inquiry-form-dashboard {
     grid-template-columns: 1fr;

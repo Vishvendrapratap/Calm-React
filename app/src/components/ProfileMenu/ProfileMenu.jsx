@@ -1,15 +1,3 @@
-// import './ProfileMenu.css';
-
-// const ProfileMenu = () => {
-//   return (
-//     <button className="profile-button">
-//       Profile
-//     </button>
-//   );
-// };
-
-// export default ProfileMenu;
-
 
 
 'use client';

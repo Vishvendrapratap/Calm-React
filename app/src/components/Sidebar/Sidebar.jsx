@@ -5,7 +5,7 @@ import './Sidebar.css';
 
 const menuItems = [
   { label: 'Dashboard', path: '/admin' },
-  { label: 'Category2', path: '/admin/category2' },
+  { label: 'Chat', path: '/admin/chat' },
   { label: 'Category3', path: '/admin/category3' },
 ];
 
