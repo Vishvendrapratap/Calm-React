@@ -1,11 +1,11 @@
 :root {
-  --color-primary: #0A2540;
-  --color-secondary: #2C5F8A;
-  --color-accent: #2E7D32;
-  --color-bg-main: #F8F9FA;
-  --color-text-primary: #1F2933;
-  --color-text-secondary: #4B5563;
-  --color-border: #D1D5DB;
+  --color-primary: #7cb342;
+  --color-secondary: #ff8c1a;
+  --color-accent: #ff8c1a;
+  --color-bg-main: #f8f9fa;
+  --color-text-primary: #1f2933;
+  --color-text-secondary: #4b5563;
+  --color-border: #d1d5db;
 }
 
 body {
@@ -14,8 +14,6 @@ body {
   background-color: var(--color-bg-main);
   color: var(--color-text-primary);
 }
-
-
 
 .admin-layout {
   display: flex;

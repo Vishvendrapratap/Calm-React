@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import './login.css';
+import "./login.css";
 
 export default function LoginPage() {
-  const [step, setStep] = useState(1); 
-  const [mobile, setMobile] = useState('');
-  const [otp, setOtp] = useState('');
+  const [step, setStep] = useState(1);
+  const [mobile, setMobile] = useState("");
+  const [otp, setOtp] = useState("");
 
   const router = useRouter();
 
@@ -20,19 +20,24 @@ export default function LoginPage() {
   };
 
   const handleVerifyOTP = () => {
-  if (otp.length === 6) {
-    localStorage.setItem("isLoggedIn", "true");
+    if (otp.length === 6) {
+      localStorage.setItem("isLoggedIn", "true");
 
-    router.push("/dashboard");
-  } else {
-    alert("Enter valid OTP");
-  }
-};
+      router.push("/dashboard");
+    } else {
+      alert("Enter valid OTP");
+    }
+  };
 
   return (
     <div className="login-wrapper">
-      
       <div className="login-card">
+        <div className="login-header">
+          <button className="back-home-btn" onClick={() => router.push("/")}>
+            ← Back to Home
+          </button>
+        </div>
+
         <h2>User Login</h2>
         <p className="subtitle">Login using your mobile number</p>
 
@@ -47,10 +52,7 @@ export default function LoginPage() {
               placeholder="Enter 10-digit mobile number"
             />
 
-            <button 
-              className="primary-btn"
-              onClick={handleSendOTP}
-            >
+            <button className="primary-btn" onClick={handleSendOTP}>
               Send OTP
             </button>
           </div>
@@ -67,22 +69,25 @@ export default function LoginPage() {
               placeholder="Enter 6-digit OTP"
             />
 
-            <button 
-              className="primary-btn"
-              onClick={handleVerifyOTP}
-            >
+            <button className="primary-btn" onClick={handleVerifyOTP}>
               Verify OTP
             </button>
 
-            <button
-              className="secondary-btn"
-              onClick={() => setStep(1)}
-            >
+            <button className="secondary-btn" onClick={() => setStep(1)}>
               ← Change Mobile Number
             </button>
           </div>
         )}
 
+        <div className="inquiry-section">
+          <p>Not ready to sign up?</p>
+          <button
+            className="inquiry-btn"
+            onClick={() => router.push("/raise-inquiry")}
+          >
+            Raise an Inquiry
+          </button>
+        </div>
       </div>
     </div>
   );

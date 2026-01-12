@@ -3,7 +3,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #eef2ff, #f8fafc);
+  background: linear-gradient(135deg, #f0f7e8, #fff5eb);
   padding: 20px;
 }
 
@@ -13,13 +13,33 @@
   background: white;
   padding: 28px;
   border-radius: 14px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
   animation: fadeIn 0.4s ease;
+}
+
+.login-header {
+  margin-bottom: 16px;
+}
+
+.back-home-btn {
+  background: none;
+  border: none;
+  color: #7cb342;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.back-home-btn:hover {
+  color: #689f38;
 }
 
 .login-card h2 {
   margin-bottom: 4px;
   text-align: center;
+  color: #7cb342;
 }
 
 .subtitle {
@@ -51,13 +71,13 @@
 
 .form-step input:focus {
   outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37,99,235,0.2);
+  border-color: #7cb342;
+  box-shadow: 0 0 0 3px rgba(124, 179, 66, 0.2);
 }
 
 .primary-btn {
   padding: 12px;
-  background: #2563eb;
+  background: #7cb342;
   color: white;
   border: none;
   border-radius: 8px;
@@ -68,25 +88,61 @@
 }
 
 .primary-btn:hover {
-  background: #1d4ed8;
+  background: #689f38;
 }
 
 .secondary-btn {
   padding: 10px;
   background: transparent;
   border: none;
-  color: #2563eb;
+  color: #ff8c1a;
   font-size: 14px;
   cursor: pointer;
   text-decoration: underline;
 }
 
 .secondary-btn:hover {
-  color: #1d4ed8;
+  color: #e67e00;
 }
 
+.inquiry-section {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+  text-align: center;
+}
+
+.inquiry-section p {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 12px;
+}
+
+.inquiry-btn {
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  border: 2px solid #ff8c1a;
+  color: #ff8c1a;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.inquiry-btn:hover {
+  background: #ff8c1a;
+  color: white;
+}
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
