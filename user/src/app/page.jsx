@@ -1,218 +1,241 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import styles from "./page.module.css";
+import Link from "next/link";
+import Navbar from "../components/Navbar/Navbar";
+import Footer from "../components/Footer/Footer";
 
-const slides = [
+const services = [
   {
-    id: 1,
-    title: "Premium Services",
-    description:
-      "Discover our wide range of professional services tailored for you",
-    image:
-      "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=1200&h=600&fit=crop",
-    color: "#7CB342",
+    icon: "🏠",
+    title: "Rent Agreement",
+    desc: "Create legally valid rental agreements instantly for any city.",
+    href: "/services/rent-agreement",
+    color: "#6C63FF",
   },
   {
-    id: 2,
-    title: "Expert Solutions",
-    description: "Connect with industry experts who deliver excellence",
-    image:
-      "https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=1200&h=600&fit=crop",
-    color: "#FF8C1A",
+    icon: "📜",
+    title: "Domicile Certificate",
+    desc: "Apply for a domicile / residence certificate for your state.",
+    href: "/services/domicile",
+    color: "#FF6584",
   },
   {
-    id: 3,
-    title: "Fast & Reliable",
-    description: "Quick turnaround times with guaranteed satisfaction",
-    image:
-      "https://images.unsplash.com/photo-1553877522-43269d4ea984?w=1200&h=600&fit=crop",
-    color: "#7CB342",
+    icon: "💍",
+    title: "Marriage Certificate",
+    desc: "Register your marriage and get your certificate hassle-free.",
+    href: "/services/marriage-certificate",
+    color: "#10b981",
   },
   {
-    id: 4,
-    title: "24/7 Support",
-    description: "Round-the-clock assistance for all your needs",
-    image:
-      "https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&h=600&fit=crop",
-    color: "#FF8C1A",
+    icon: "✅",
+    title: "Character Certificate",
+    desc: "Obtain a character / police verification certificate easily.",
+    href: "/services/character-certificate",
+    color: "#f59e0b",
   },
 ];
 
 export default function Home() {
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const router = useRouter();
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, []);
-
-  const goToSlide = (index) => {
-    setCurrentSlide(index);
-  };
-
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % slides.length);
-  };
-
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
-  };
-
   return (
-    <div className={styles.homePage}>
-      {/* Header */}
-      <header className={styles.header}>
-        <div className={styles.logo}>
-          <span className={styles.logoIcon}>✦</span>
-          <span>Kaamzy</span>
-        </div>
-        <nav className={styles.nav}>
-          <a href="#services">Services</a>
-          <a href="#about">About</a>
-          <a href="#contact">Contact</a>
-          <a href="/raise-inquiry" className={styles.inquiryLink}>
-            Raise Inquiry
-          </a>
-        </nav>
-        <div className={styles.authButtons}>
-          <button
-            onClick={() => router.push("/login")}
-            className={styles.loginBtn}
-          >
-            Login
-          </button>
-          <button
-            onClick={() => router.push("/login")}
-            className={styles.signupBtn}
-          >
-            Sign Up
-          </button>
-        </div>
-      </header>
+    <div>
+      <Navbar />
 
-      {/* Hero Slideshow */}
-      <section className={styles.slideshow}>
-        <div className={styles.slidesContainer}>
-          {slides.map((slide, index) => (
-            <div
-              key={slide.id}
-              className={`${styles.slide} ${
-                index === currentSlide ? styles.active : ""
-              }`}
-              style={{ backgroundImage: `url(${slide.image})` }}
-            >
-              <div
-                className={styles.slideOverlay}
-                style={{
-                  background: `linear-gradient(135deg, ${slide.color}dd 0%, ${slide.color}88 100%)`,
-                }}
-              />
-              <div className={styles.slideContent}>
-                <h1>{slide.title}</h1>
-                <p>{slide.description}</p>
-                <div className={styles.ctaButtons}>
-                  <button
-                    onClick={() => router.push("/login")}
-                    className={styles.ctaButton}
-                  >
-                    Get Started
-                  </button>
-                  <button
-                    onClick={() => router.push("/raise-inquiry")}
-                    className={styles.ctaButtonSecondary}
-                  >
-                    Raise Inquiry
-                  </button>
+      {/* ── Hero ── */}
+      <section style={hero}>
+        <div style={heroBg} />
+        <div style={heroContent}>
+          <span style={badge}>🚀 Fast & Trusted Document Services</span>
+          <h1 style={heroTitle}>
+            Government Documents<br />
+            <span style={{ color: "var(--accent)" }}>Made Simple</span>
+          </h1>
+          <p style={heroSub}>
+            Apply for rent agreements, domicile certificates, marriage certificates and character
+            certificates — all from the comfort of your home.
+          </p>
+          <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
+            <Link href="/services" style={btnPrimary}>
+              Browse Services →
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Services Preview ── */}
+      <section style={sectionStyle}>
+        <div style={{ textAlign: "center", marginBottom: 48 }}>
+          <h2 style={sectionTitle}>Our Services</h2>
+          <p style={sectionSub}>Select a service to get started with your application</p>
+        </div>
+        <div style={grid}>
+          {services.map((s) => (
+            <Link key={s.href} href={s.href} style={{ textDecoration: "none" }}>
+              <div style={card} className="service-card">
+                <div style={{ ...iconBox, background: s.color + "18", color: s.color }}>
+                  <span style={{ fontSize: 32 }}>{s.icon}</span>
                 </div>
+                <h3 style={{ fontSize: 18, fontWeight: 700, color: "var(--text)", marginBottom: 6 }}>
+                  {s.title}
+                </h3>
+                <p style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.6 }}>
+                  {s.desc}
+                </p>
+                <span style={applyLink}>Apply Now →</span>
               </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Navigation Arrows */}
-        <button
-          className={styles.navArrow + " " + styles.prevArrow}
-          onClick={prevSlide}
-        >
-          ‹
-        </button>
-        <button
-          className={styles.navArrow + " " + styles.nextArrow}
-          onClick={nextSlide}
-        >
-          ›
-        </button>
-
-        {/* Dots */}
-        <div className={styles.dots}>
-          {slides.map((_, index) => (
-            <button
-              key={index}
-              className={`${styles.dot} ${
-                index === currentSlide ? styles.activeDot : ""
-              }`}
-              onClick={() => goToSlide(index)}
-            />
+            </Link>
           ))}
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className={styles.features}>
-        <h2>Why Choose Us</h2>
-        <div className={styles.featureGrid}>
-          <div className={styles.featureCard}>
-            <div
-              className={styles.featureIcon}
-              style={{ background: "#7CB342" }}
-            >
-              🎯
+      {/* ── How it works ── */}
+      <section style={{ ...sectionStyle, background: "#fff" }}>
+        <div style={{ textAlign: "center", marginBottom: 48 }}>
+          <h2 style={sectionTitle}>How It Works</h2>
+          <p style={sectionSub}>Three simple steps to get your documents</p>
+        </div>
+        <div style={{ display: "flex", gap: 32, flexWrap: "wrap", justifyContent: "center" }}>
+          {[
+            { step: "1", icon: "📝", title: "Fill the Form", desc: "Provide your details in our easy-to-use forms" },
+            { step: "2", icon: "📤", title: "Submit Application", desc: "We store your data securely and process it" },
+            { step: "3", icon: "📄", title: "Get Your Document", desc: "Receive your document delivered at your doorstep" },
+          ].map((s) => (
+            <div key={s.step} style={stepCard}>
+              <div style={stepNum}>{s.step}</div>
+              <span style={{ fontSize: 36 }}>{s.icon}</span>
+              <h3 style={{ fontSize: 17, fontWeight: 700, marginTop: 12 }}>{s.title}</h3>
+              <p style={{ fontSize: 14, color: "var(--text-secondary)", marginTop: 4 }}>{s.desc}</p>
             </div>
-            <h3>Quality Service</h3>
-            <p>We deliver top-notch services with attention to every detail</p>
-          </div>
-          <div className={styles.featureCard}>
-            <div
-              className={styles.featureIcon}
-              style={{ background: "#FF8C1A" }}
-            >
-              ⚡
-            </div>
-            <h3>Fast Delivery</h3>
-            <p>Quick turnaround without compromising on quality</p>
-          </div>
-          <div className={styles.featureCard}>
-            <div
-              className={styles.featureIcon}
-              style={{ background: "#7CB342" }}
-            >
-              💰
-            </div>
-            <h3>Best Prices</h3>
-            <p>Competitive pricing that fits your budget</p>
-          </div>
-          <div className={styles.featureCard}>
-            <div
-              className={styles.featureIcon}
-              style={{ background: "#FF8C1A" }}
-            >
-              🛡️
-            </div>
-            <h3>Secure & Safe</h3>
-            <p>Your data and transactions are always protected</p>
-          </div>
+          ))}
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className={styles.footer}>
-        <p>© 2026 Kaamzy. All rights reserved.</p>
-      </footer>
+      <Footer />
+
+      <style>{`
+        .service-card { transition: transform .25s, box-shadow .25s; }
+        .service-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
+        @keyframes spin { to { transform: rotate(360deg); } }
+      `}</style>
     </div>
   );
 }
+
+/* ── inline styles ── */
+const hero = {
+  position: "relative",
+  minHeight: "85vh",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  overflow: "hidden",
+};
+const heroBg = {
+  position: "absolute",
+  inset: 0,
+  background: "linear-gradient(135deg, #6C63FF 0%, #a78bfa 50%, #FF6584 100%)",
+  opacity: 0.08,
+};
+const heroContent = {
+  position: "relative",
+  textAlign: "center",
+  maxWidth: 720,
+  padding: "0 24px",
+};
+const badge = {
+  display: "inline-block",
+  background: "var(--primary)",
+  color: "#fff",
+  padding: "6px 18px",
+  borderRadius: 50,
+  fontSize: 13,
+  fontWeight: 600,
+  marginBottom: 24,
+};
+const heroTitle = {
+  fontSize: 52,
+  fontWeight: 800,
+  lineHeight: 1.15,
+  color: "var(--text)",
+  marginBottom: 20,
+};
+const heroSub = {
+  fontSize: 18,
+  color: "var(--text-secondary)",
+  maxWidth: 560,
+  margin: "0 auto 32px",
+  lineHeight: 1.7,
+};
+const btnPrimary = {
+  display: "inline-flex",
+  alignItems: "center",
+  padding: "14px 36px",
+  background: "var(--primary)",
+  color: "#fff",
+  borderRadius: "var(--radius-sm)",
+  fontWeight: 700,
+  fontSize: 16,
+  textDecoration: "none",
+  margin: "0 auto",
+};
+const sectionStyle = {
+  padding: "80px 24px",
+  maxWidth: 1200,
+  margin: "0 auto",
+};
+const sectionTitle = {
+  fontSize: 32,
+  fontWeight: 800,
+  color: "var(--text)",
+};
+const sectionSub = {
+  fontSize: 16,
+  color: "var(--text-secondary)",
+  marginTop: 8,
+};
+const grid = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
+  gap: 24,
+};
+const card = {
+  background: "var(--bg-card)",
+  borderRadius: "var(--radius)",
+  padding: 28,
+  border: "1px solid var(--border)",
+  cursor: "pointer",
+};
+const iconBox = {
+  width: 56,
+  height: 56,
+  borderRadius: 12,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  marginBottom: 16,
+};
+const applyLink = {
+  display: "inline-block",
+  marginTop: 14,
+  fontSize: 14,
+  fontWeight: 600,
+  color: "var(--primary)",
+};
+const stepCard = {
+  textAlign: "center",
+  padding: 32,
+  flex: "1 1 260px",
+  maxWidth: 300,
+};
+const stepNum = {
+  width: 36,
+  height: 36,
+  background: "var(--primary)",
+  color: "#fff",
+  borderRadius: "50%",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  fontWeight: 700,
+  fontSize: 16,
+  margin: "0 auto 16px",
+};
