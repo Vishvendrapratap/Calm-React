@@ -1,8 +1,9 @@
 import '../styles/global.css';
 
 export const metadata = {
-  title: 'DocEase – Document Services Made Simple',
-  description: 'Apply for rent agreements, domicile certificates, marriage certificates, and character certificates online.',
+  title: "Kaamzy - Government Services Made Easy",
+  description:
+    "Apply for rent agreement and police verification services in minutes with Kaamzy.",
 };
 
 export default function RootLayout({ children }) {
@@ -10,7 +11,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <head>
         <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap"
           rel="stylesheet"
         />
       </head>

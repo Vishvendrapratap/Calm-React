@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { MessageCircle } from "lucide-react";
+import { IdCard, MessageCircle } from "lucide-react";
 import Navbar from "../../../components/Navbar/Navbar";
 import Footer from "../../../components/Footer/Footer";
 import FormField from "../../../components/FormField/FormField";
@@ -11,22 +11,17 @@ import STATES_AND_CITIES from "../../../data/indianStatesAndCities";
 
 const initialState = {
   fullName: "",
-  fatherName: "",
-  motherName: "",
-  dob: "",
-  gender: "",
   phone: "",
   email: "",
-  aadharNumber: "",
-  currentAddress: "",
   state: "",
   city: "",
-  pincode: "",
-  residingSince: "",
-  purpose: "",
+  vehicleNumber: "",
+  rtoServiceType: "",
+  issueSummary: "",
+  preferredTime: "",
 };
 
-export default function DomicilePage() {
+export default function RtoWorkPage() {
   const [form, setForm] = useState(initialState);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -47,11 +42,23 @@ export default function DomicilePage() {
       const res = await fetch("/api/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ serviceType: "domicile-certificate", ...form }),
+        body: JSON.stringify({ serviceType: "rto-work", ...form }),
       });
       const data = await res.json();
       if (data.success) {
-        router.push(`/success?service=Domicile Certificate&id=${data.id}`);
+        const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "919336552858";
+        const message = [
+          "New KaamZy inquiry: RTO Work",
+          `Lead ID: ${data.id}`,
+          `Name: ${form.fullName}`,
+          `Phone: ${form.phone}`,
+          `Service Type: ${form.rtoServiceType}`,
+          `Vehicle: ${form.vehicleNumber || "Not provided"}`,
+        ].join("\n");
+        window.location.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+        setTimeout(() => {
+          router.push(`/success?service=RTO Work&id=${data.id}`);
+        }, 1200);
       } else {
         alert(data.error || "Something went wrong");
       }
@@ -64,12 +71,8 @@ export default function DomicilePage() {
 
   const openWhatsAppChat = () => {
     const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "919336552858";
-    const message =
-      "Hi Kaamzy team, I want help with Domicile Certificate service. Please assist me.";
-    window.open(
-      `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`,
-      "_blank"
-    );
+    const message = "Hi KaamZy team, I want help with RTO Work. Please assist me.";
+    window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, "_blank");
   };
 
   return (
@@ -82,16 +85,18 @@ export default function DomicilePage() {
           <div style={heroContent}>
             <h1 style={heroTitle}>Fill the form or chat with us directly.</h1>
             <p style={heroSub}>
-              Apply for domicile certificate with guided support and quick
-              follow-up.
+              Share your RTO requirement and get support for fitness, license,
+              and related tasks.
             </p>
           </div>
         </section>
 
         <div style={header}>
-          <span style={iconBadge}>📜</span>
-          <h1 style={title}>Domicile Certificate</h1>
-          <p style={sub}>Proof of residence for your state — required for admissions, jobs & more</p>
+          <span style={iconBadge}>
+            <IdCard size={36} strokeWidth={2.2} />
+          </span>
+          <h1 style={title}>RTO Work</h1>
+          <p style={sub}>Support for fitness, license issues, RC updates and other RTO needs.</p>
         </div>
 
         <button type="button" onClick={openWhatsAppChat} style={whatsappBtn}>
@@ -102,32 +107,35 @@ export default function DomicilePage() {
         </button>
 
         <form onSubmit={submit} style={formCard} className="heritage-form-center">
-          <h2 style={sectionHead}>Personal Details</h2>
+          <h2 style={sectionHead}>Applicant Details</h2>
           <div style={grid}>
-            <FormField label="Full Name" name="fullName" value={form.fullName} onChange={handle} placeholder="As per Aadhar" />
-            <FormField label="Father's Name" name="fatherName" value={form.fatherName} onChange={handle} placeholder="Father's full name" />
-            <FormField label="Mother's Name" name="motherName" value={form.motherName} onChange={handle} placeholder="Mother's full name" />
-            <FormField label="Date of Birth" name="dob" type="date" value={form.dob} onChange={handle} />
-            <FormField label="Gender" name="gender" type="select" value={form.gender} onChange={handle} options={["Male", "Female", "Other"]} placeholder="Select Gender" />
-            <FormField label="Phone" name="phone" type="tel" value={form.phone} onChange={handle} placeholder="10-digit phone" />
-            <FormField label="Email" name="email" type="email" value={form.email} onChange={handle} placeholder="email@example.com" />
-            <FormField label="Aadhar Number" name="aadharNumber" value={form.aadharNumber} onChange={handle} placeholder="12-digit Aadhar" />
+            <FormField label="Full Name" name="fullName" value={form.fullName} onChange={handle} placeholder="Your name" />
+            <FormField label="Phone" name="phone" type="tel" value={form.phone} onChange={handle} placeholder="10-digit number" />
+            <FormField label="Email" name="email" type="email" value={form.email} onChange={handle} placeholder="email@example.com" required={false} />
+            <FormField label="State" name="state" type="select" value={form.state} onChange={handle} options={Object.keys(STATES_AND_CITIES)} placeholder="Select state" />
+            <FormField label="City" name="city" type="select" value={form.city} onChange={handle} options={form.state ? STATES_AND_CITIES[form.state] : []} placeholder="Select city" />
           </div>
 
-          <h2 style={sectionHead}>Address & Residency</h2>
-          <FormField label="Current Address" name="currentAddress" type="textarea" value={form.currentAddress} onChange={handle} placeholder="Full postal address" rows={3} />
-          <div style={{ ...grid, marginTop: 16 }}>
-            <FormField label="State" name="state" type="select" value={form.state} onChange={handle} options={Object.keys(STATES_AND_CITIES)} placeholder="Select State" />
-            <FormField label="City" name="city" type="select" value={form.city} onChange={handle} options={form.state ? STATES_AND_CITIES[form.state] : []} placeholder="Select City" />
-            <FormField label="Pincode" name="pincode" value={form.pincode} onChange={handle} placeholder="6-digit pincode" />
-            <FormField label="Residing Since" name="residingSince" type="date" value={form.residingSince} onChange={handle} />
+          <h2 style={sectionHead}>RTO Request</h2>
+          <div style={grid}>
+            <FormField label="Vehicle Number" name="vehicleNumber" value={form.vehicleNumber} onChange={handle} placeholder="e.g. MH12AB1234" required={false} />
+            <FormField
+              label="Service Type"
+              name="rtoServiceType"
+              type="select"
+              value={form.rtoServiceType}
+              onChange={handle}
+              options={["Fitness Renewal", "License Issue", "RC Transfer", "NOC", "Duplicate RC/License", "Other"]}
+              placeholder="Select service type"
+            />
+            <FormField label="Preferred Call Time" name="preferredTime" value={form.preferredTime} onChange={handle} placeholder="e.g. 6 PM - 8 PM" required={false} />
           </div>
-
-          <h2 style={sectionHead}>Purpose</h2>
-          <FormField label="Purpose of Certificate" name="purpose" type="select" value={form.purpose} onChange={handle} options={["Education / Admission", "Government Job", "Private Job", "Legal / Court", "Passport", "Other"]} placeholder="Select purpose" />
+          <div style={{ marginTop: 16 }}>
+            <FormField label="Issue Summary" name="issueSummary" type="textarea" value={form.issueSummary} onChange={handle} placeholder="Describe what help you need..." rows={3} />
+          </div>
 
           <div style={{ marginTop: 28 }}>
-            <SubmitButton loading={loading} label="Submit Domicile Application" />
+            <SubmitButton loading={loading} label="Submit RTO Work Request" />
           </div>
         </form>
       </div>
@@ -151,7 +159,7 @@ const heroImage = {
   position: "absolute",
   inset: 0,
   backgroundImage:
-    "url(https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1400&q=70)",
+    "url(https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1400&q=70)",
   backgroundSize: "cover",
   backgroundPosition: "center",
 };
@@ -169,8 +177,17 @@ const heroContent = {
 };
 const heroTitle = { fontSize: 32, lineHeight: 1.15, fontWeight: 800 };
 const heroSub = { fontSize: 14, lineHeight: 1.7, marginTop: 10, color: "rgba(255,255,255,.95)" };
-const header = { textAlign: "center", marginBottom: 36 };
-const iconBadge = { fontSize: 40 };
+const header = { textAlign: "center", marginBottom: 28 };
+const iconBadge = {
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  width: 56,
+  height: 56,
+  borderRadius: 14,
+  background: "rgba(31,138,76,.12)",
+  color: "var(--primary-dark)",
+};
 const title = { fontSize: 30, fontWeight: 800, color: "var(--text)", marginTop: 8 };
 const sub = { fontSize: 15, color: "var(--text-secondary)", marginTop: 4 };
 const whatsappBtn = {

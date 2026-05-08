@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { FileText, MessageCircle } from "lucide-react";
+import { MessageCircle, ShieldCheck } from "lucide-react";
 import Navbar from "../../../components/Navbar/Navbar";
 import Footer from "../../../components/Footer/Footer";
 import FormField from "../../../components/FormField/FormField";
@@ -10,23 +10,18 @@ import SubmitButton from "../../../components/SubmitButton/SubmitButton";
 import STATES_AND_CITIES from "../../../data/indianStatesAndCities";
 
 const initialState = {
-  landlordName: "",
-  landlordPhone: "",
-  landlordEmail: "",
-  tenantName: "",
-  tenantPhone: "",
-  tenantEmail: "",
-  propertyAddress: "",
+  applicantName: "",
+  phone: "",
+  email: "",
+  verificationType: "",
+  purpose: "",
   state: "",
   city: "",
-  monthlyRent: "",
-  securityDeposit: "",
-  agreementStartDate: "",
-  agreementDuration: "",
-  specialTerms: "",
+  address: "",
+  preferredCallTime: "",
 };
 
-export default function RentAgreementPage() {
+export default function PoliceVerificationPage() {
   const [form, setForm] = useState(initialState);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -47,24 +42,25 @@ export default function RentAgreementPage() {
       const res = await fetch("/api/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ serviceType: "rent-agreement", ...form }),
+        body: JSON.stringify({ serviceType: "police-verification", ...form }),
       });
       const data = await res.json();
+
       if (data.success) {
         const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "919336552858";
         const message = [
-          "New Kaamzy inquiry: Rent Agreement",
+          "New Kaamzy inquiry: Police Verification",
           `Lead ID: ${data.id}`,
-          `Landlord: ${form.landlordName} (${form.landlordPhone})`,
-          `Tenant: ${form.tenantName} (${form.tenantPhone})`,
+          `Name: ${form.applicantName}`,
+          `Phone: ${form.phone}`,
+          `Type: ${form.verificationType}`,
+          `Purpose: ${form.purpose}`,
           `Location: ${form.city}, ${form.state}`,
-          `Rent: INR ${form.monthlyRent}`,
-          `Start Date: ${form.agreementStartDate || "Not shared"}`,
         ].join("\n");
 
         window.location.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
         setTimeout(() => {
-          router.push(`/success?service=Rent Agreement&id=${data.id}`);
+          router.push(`/success?service=Police Verification&id=${data.id}`);
         }, 1200);
       } else {
         alert(data.error || "Something went wrong");
@@ -79,7 +75,7 @@ export default function RentAgreementPage() {
   const openWhatsAppChat = () => {
     const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "919336552858";
     const message =
-      "Hi Kaamzy team, I want help with Rent Agreement service. Please assist me.";
+      "Hi Kaamzy team, I want help with Police Verification service. Please assist me.";
     window.open(
       `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`,
       "_blank"
@@ -90,26 +86,26 @@ export default function RentAgreementPage() {
     <div>
       <Navbar />
       <div style={wrapper}>
-        <div style={header}>
-          <span style={iconBadge}>
-            <FileText size={36} strokeWidth={2.2} />
-          </span>
-          <h1 style={title}>Rent Agreement</h1>
-        </div>
-
         <section style={heroCard}>
           <div style={heroImage} aria-hidden />
           <div style={heroOverlay} />
           <div style={heroContent}>
             <h1 style={heroTitle}>Fill the form or chat with us directly.</h1>
             <p style={heroSub}>
-              Mobile-first flow for landlords and tenants. Fill once, submit, and
-              continue instantly on WhatsApp.
+              Share applicant details and we will guide your police verification
+              process quickly.
             </p>
           </div>
         </section>
 
-        <p style={hintText}>After submission, we will open WhatsApp with your lead details prefilled.</p>
+        <div style={header}>
+          <span style={iconBadge}>
+            <ShieldCheck size={36} strokeWidth={2.2} />
+          </span>
+          <h1 style={title}>Police Verification</h1>
+          <p style={sub}>Share your details and we will guide the process end-to-end.</p>
+          <p style={hintText}>On submit, WhatsApp opens with your lead details.</p>
+        </div>
 
         <button type="button" onClick={openWhatsAppChat} style={whatsappBtn}>
           <span style={whatsappIcon}>
@@ -119,39 +115,38 @@ export default function RentAgreementPage() {
         </button>
 
         <form onSubmit={submit} style={formCard} className="heritage-form-center">
-          {/* Landlord */}
-          <h2 style={sectionHead}>Landlord Details</h2>
+          <h2 style={sectionHead}>Applicant Details</h2>
           <div style={grid}>
-            <FormField label="Full Name" name="landlordName" value={form.landlordName} onChange={handle} placeholder="Landlord full name" />
-            <FormField label="Phone Number" name="landlordPhone" type="tel" value={form.landlordPhone} onChange={handle} placeholder="10-digit phone" />
-            <FormField label="Email" name="landlordEmail" type="email" value={form.landlordEmail} onChange={handle} placeholder="email@example.com" />
+            <FormField label="Full Name" name="applicantName" value={form.applicantName} onChange={handle} placeholder="Your full name" />
+            <FormField label="Phone Number" name="phone" type="tel" value={form.phone} onChange={handle} placeholder="10-digit number" />
+            <FormField label="Email" name="email" type="email" value={form.email} onChange={handle} placeholder="email@example.com" required={false} />
+            <FormField
+              label="Verification Type"
+              name="verificationType"
+              type="select"
+              value={form.verificationType}
+              onChange={handle}
+              options={["Tenant", "Employee", "Domestic Help", "Personal"]}
+              placeholder="Select type"
+            />
           </div>
 
-          {/* Tenant */}
-          <h2 style={sectionHead}>Tenant Details</h2>
+          <h2 style={sectionHead}>Location & Requirement</h2>
           <div style={grid}>
-            <FormField label="Full Name" name="tenantName" value={form.tenantName} onChange={handle} placeholder="Tenant full name" />
-            <FormField label="Phone Number" name="tenantPhone" type="tel" value={form.tenantPhone} onChange={handle} placeholder="10-digit phone" />
-            <FormField label="Email" name="tenantEmail" type="email" value={form.tenantEmail} onChange={handle} placeholder="email@example.com" />
+            <FormField label="State" name="state" type="select" value={form.state} onChange={handle} options={Object.keys(STATES_AND_CITIES)} placeholder="Select state" />
+            <FormField label="City" name="city" type="select" value={form.city} onChange={handle} options={form.state ? STATES_AND_CITIES[form.state] : []} placeholder="Select city" />
+            <FormField label="Preferred Call Time" name="preferredCallTime" value={form.preferredCallTime} onChange={handle} placeholder="e.g. 5 PM - 7 PM" required={false} />
           </div>
 
-          {/* Property */}
-          <h2 style={sectionHead}>Property & Agreement Details</h2>
-          <FormField label="Property Address" name="propertyAddress" type="textarea" value={form.propertyAddress} onChange={handle} placeholder="Full address of the property" rows={3} />
-          <div style={{ ...grid, marginTop: 16 }}>
-            <FormField label="State" name="state" type="select" value={form.state} onChange={handle} options={Object.keys(STATES_AND_CITIES)} placeholder="Select State" />
-            <FormField label="City" name="city" type="select" value={form.city} onChange={handle} options={form.state ? STATES_AND_CITIES[form.state] : []} placeholder="Select City" />
-            <FormField label="Monthly Rent (₹)" name="monthlyRent" type="number" value={form.monthlyRent} onChange={handle} placeholder="e.g. 15000" />
-            <FormField label="Security Deposit (₹)" name="securityDeposit" type="number" value={form.securityDeposit} onChange={handle} placeholder="e.g. 30000" />
-            <FormField label="Start Date" name="agreementStartDate" type="date" value={form.agreementStartDate} onChange={handle} />
-            <FormField label="Duration (months)" name="agreementDuration" type="number" value={form.agreementDuration} onChange={handle} placeholder="e.g. 11" />
+          <div style={{ marginTop: 16 }}>
+            <FormField label="Address" name="address" type="textarea" value={form.address} onChange={handle} placeholder="Current address for verification" rows={3} />
           </div>
           <div style={{ marginTop: 16 }}>
-            <FormField label="Special Terms / Conditions" name="specialTerms" type="textarea" value={form.specialTerms} onChange={handle} placeholder="Any additional terms…" required={false} rows={3} />
+            <FormField label="Purpose / Notes" name="purpose" type="textarea" value={form.purpose} onChange={handle} placeholder="Any context or urgency details" rows={3} />
           </div>
 
           <div style={{ marginTop: 28 }}>
-            <SubmitButton loading={loading} label="Submit Rent Agreement" />
+            <SubmitButton loading={loading} label="Submit Police Verification" />
           </div>
         </form>
       </div>
@@ -164,7 +159,7 @@ export default function RentAgreementPage() {
 const wrapper = { maxWidth: 800, margin: "0 auto", padding: "40px 24px" };
 const heroCard = {
   position: "relative",
-  minHeight: 240,
+  minHeight: 220,
   borderRadius: 18,
   overflow: "hidden",
   marginBottom: 26,
@@ -175,7 +170,7 @@ const heroImage = {
   position: "absolute",
   inset: 0,
   backgroundImage:
-    "url(https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=1400&q=70)",
+    "url(https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1400&q=70)",
   backgroundSize: "cover",
   backgroundPosition: "center",
 };
@@ -189,17 +184,9 @@ const heroContent = {
   position: "relative",
   color: "#fff",
   padding: "28px 24px",
-  maxWidth: 520,
+  maxWidth: 560,
 };
-const heroBadge = {
-  display: "inline-block",
-  fontSize: 12,
-  fontWeight: 700,
-  background: "rgba(255,255,255,.18)",
-  padding: "7px 12px",
-  borderRadius: 999,
-};
-const heroTitle = { fontSize: 34, lineHeight: 1.15, fontWeight: 800, marginTop: 14 };
+const heroTitle = { fontSize: 32, lineHeight: 1.15, fontWeight: 800 };
 const heroSub = { fontSize: 14, lineHeight: 1.7, marginTop: 10, color: "rgba(255,255,255,.95)" };
 const header = { textAlign: "center", marginBottom: 36 };
 const iconBadge = {
@@ -213,7 +200,8 @@ const iconBadge = {
   color: "var(--primary-dark)",
 };
 const title = { fontSize: 30, fontWeight: 800, color: "var(--text)", marginTop: 8 };
-const hintText = { fontSize: 13, color: "var(--primary-dark)", marginBottom: 10, fontWeight: 600, textAlign: "center" };
+const sub = { fontSize: 15, color: "var(--text-secondary)", marginTop: 4 };
+const hintText = { fontSize: 13, color: "var(--primary-dark)", marginTop: 8, fontWeight: 600 };
 const whatsappBtn = {
   width: "100%",
   display: "flex",

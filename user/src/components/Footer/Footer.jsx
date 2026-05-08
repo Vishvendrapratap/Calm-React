@@ -1,24 +1,28 @@
 "use client";
 
 import Link from "next/link";
+import { Landmark } from "lucide-react";
 
 export default function Footer() {
   return (
     <footer style={styles.footer}>
       <div style={styles.inner}>
         <div style={styles.brand}>
-          <span style={{ fontSize: 20, fontWeight: 800, color: "var(--primary)" }}>
-            📄 Doc<span style={{ color: "var(--accent)" }}>Ease</span>
+          <span style={styles.brandTitle}>
+            <Landmark size={20} strokeWidth={2.2} />
+            <span style={styles.logoName}>Kaa<span style={{ color: "var(--accent)" }}>mZy</span></span>
           </span>
           <p style={{ color: "var(--text-secondary)", fontSize: 14, marginTop: 8 }}>
-            Making government document services simple, fast, and hassle-free.
+            Fast and simple government services for Indian users across mobile ad campaigns.
           </p>
         </div>
         <div style={styles.links}>
           <h4 style={styles.linkTitle}>Services</h4>
           <Link href="/services/rent-agreement" style={styles.link}>Rent Agreement</Link>
-          <Link href="/services/domicile" style={styles.link}>Domicile Certificate</Link>
-          <Link href="/services/marriage-certificate" style={styles.link}>Marriage Certificate</Link>
+          <Link href="/services/police-verification" style={styles.link}>Police Verification</Link>
+          <Link href="/services/domicile" style={styles.link}>Domicile</Link>
+          <Link href="/services/challan-settlement" style={styles.link}>Challan Settlement</Link>
+          <Link href="/services/rto-work" style={styles.link}>RTO Work</Link>
           <Link href="/services/character-certificate" style={styles.link}>Character Certificate</Link>
         </div>
         <div style={styles.links}>
@@ -36,7 +40,7 @@ export default function Footer() {
 
 const styles = {
   footer: {
-    background: "#1e1e2f",
+    background: "#13291d",
     color: "#fff",
     paddingTop: 48,
   },
@@ -49,6 +53,20 @@ const styles = {
     gap: 40,
   },
   brand: {},
+  brandTitle: {
+    fontSize: 20,
+    fontWeight: 800,
+    color: "var(--primary)",
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 8,
+  },
+  logoName: {
+    fontFamily: "var(--font-display)",
+    fontWeight: 900,
+    letterSpacing: ".03em",
+    lineHeight: 1,
+  },
   links: { display: "flex", flexDirection: "column", gap: 8 },
   linkTitle: { fontSize: 14, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, marginBottom: 4, color: "var(--primary-light)" },
   link: { fontSize: 14, color: "#ccc", textDecoration: "none" },

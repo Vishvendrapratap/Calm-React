@@ -1,6 +1,7 @@
 "use client";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { Landmark, MessageCircle } from "lucide-react";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -14,8 +15,10 @@ export default function Navbar() {
     <header style={styles.header}>
       <div style={styles.inner}>
         <Link href="/" style={styles.logo}>
-          <span style={styles.logoIcon}>📄</span>
-          <span>Doc<span style={{ color: "var(--accent)" }}>Ease</span></span>
+          <span style={styles.logoIcon}>
+            <Landmark size={24} strokeWidth={2.2} />
+          </span>
+          <span style={styles.logoName}>Kaa<span style={{ color: "var(--accent)" }}>mZy</span></span>
         </Link>
 
         <nav style={styles.nav}>
@@ -33,8 +36,12 @@ export default function Navbar() {
           ))}
         </nav>
 
-        <Link href="/services" style={styles.cta}>
-          Apply Now
+        <Link
+          href="/?chat=1"
+          style={styles.cta}
+        >
+          <MessageCircle size={16} strokeWidth={2.4} />
+          WhatsApp
         </Link>
       </div>
     </header>
@@ -46,52 +53,69 @@ const styles = {
     position: "sticky",
     top: 0,
     zIndex: 100,
-    background: "rgba(255,255,255,.85)",
-    backdropFilter: "blur(12px)",
-    borderBottom: "1px solid var(--border)",
+    background: "rgba(255,255,255,.72)",
+    backdropFilter: "blur(14px)",
+    borderBottom: "1px solid rgba(226,232,240,.75)",
   },
   inner: {
     maxWidth: 1200,
     margin: "0 auto",
-    padding: "0 24px",
-    height: 64,
+    padding: "10px 24px",
+    minHeight: 72,
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
+    gap: 12,
   },
   logo: {
     display: "flex",
     alignItems: "center",
     gap: 8,
-    fontSize: 22,
+    fontSize: 21,
     fontWeight: 800,
     color: "var(--primary)",
     textDecoration: "none",
   },
-  logoIcon: { fontSize: 26 },
-  nav: { display: "flex", gap: 32 },
+  logoIcon: { display: "inline-flex", alignItems: "center", justifyContent: "center" },
+  logoName: {
+    fontFamily: "var(--font-display)",
+    fontWeight: 900,
+    letterSpacing: ".03em",
+    lineHeight: 1,
+  },
+  nav: {
+    display: "flex",
+    gap: 8,
+    padding: 4,
+    borderRadius: 999,
+    background: "rgba(255,255,255,.7)",
+    border: "1px solid rgba(226,232,240,.9)",
+  },
   link: {
-    fontSize: 15,
-    fontWeight: 500,
+    fontSize: 14,
+    fontWeight: 600,
     color: "var(--text-secondary)",
     textDecoration: "none",
     transition: "color var(--transition)",
-    padding: "6px 0",
+    padding: "8px 14px",
+    borderRadius: 999,
   },
   activeLink: {
-    color: "var(--primary)",
-    fontWeight: 600,
+    color: "#fff",
+    background: "linear-gradient(135deg, var(--primary), var(--primary-dark))",
+    boxShadow: "0 6px 16px rgba(18,109,56,.22)",
   },
   cta: {
     display: "inline-flex",
     alignItems: "center",
-    padding: "10px 24px",
-    background: "var(--primary)",
+    gap: 8,
+    padding: "10px 16px",
+    background: "#22c55e",
     color: "#fff",
-    borderRadius: "var(--radius-sm)",
-    fontWeight: 600,
+    borderRadius: 999,
+    fontWeight: 700,
     fontSize: 14,
     textDecoration: "none",
-    transition: "background var(--transition)",
+    transition: "transform var(--transition), background var(--transition)",
   },
 };

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { MessageCircle } from "lucide-react";
 import Navbar from "../../../components/Navbar/Navbar";
 import Footer from "../../../components/Footer/Footer";
 import FormField from "../../../components/FormField/FormField";
@@ -63,10 +64,32 @@ export default function MarriageCertificatePage() {
     }
   };
 
+  const openWhatsAppChat = () => {
+    const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "919336552858";
+    const message =
+      "Hi Kaamzy team, I want help with Marriage Certificate service. Please assist me.";
+    window.open(
+      `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`,
+      "_blank"
+    );
+  };
+
   return (
     <div>
       <Navbar />
       <div style={wrapper}>
+        <section style={heroCard}>
+          <div style={heroImage} aria-hidden />
+          <div style={heroOverlay} />
+          <div style={heroContent}>
+            <h1 style={heroTitle}>Fill the form or chat with us directly.</h1>
+            <p style={heroSub}>
+              Register marriage details smoothly with guided assistance for each
+              step.
+            </p>
+          </div>
+        </section>
+
         <div style={header}>
           <span style={iconBadge}>💍</span>
           <h1 style={title}>Marriage Certificate</h1>
@@ -75,7 +98,14 @@ export default function MarriageCertificatePage() {
           </p>
         </div>
 
-        <form onSubmit={submit} style={formCard}>
+        <button type="button" onClick={openWhatsAppChat} style={whatsappBtn}>
+          <span style={whatsappIcon}>
+            <MessageCircle size={18} strokeWidth={2.5} />
+          </span>
+          Chat with us on WhatsApp
+        </button>
+
+        <form onSubmit={submit} style={formCard} className="heritage-form-center">
           <h2 style={sectionHead}>Husband Details</h2>
           <div style={grid}>
             <FormField
@@ -232,6 +262,37 @@ export default function MarriageCertificatePage() {
 }
 
 const wrapper = { maxWidth: 800, margin: "0 auto", padding: "40px 24px" };
+const heroCard = {
+  position: "relative",
+  minHeight: 220,
+  borderRadius: 18,
+  overflow: "hidden",
+  marginBottom: 26,
+  border: "1px solid var(--border)",
+  boxShadow: "var(--shadow)",
+};
+const heroImage = {
+  position: "absolute",
+  inset: 0,
+  backgroundImage:
+    "url(https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1400&q=70)",
+  backgroundSize: "cover",
+  backgroundPosition: "center",
+};
+const heroOverlay = {
+  position: "absolute",
+  inset: 0,
+  background:
+    "linear-gradient(120deg, rgba(18,109,56,.92), rgba(18,109,56,.55) 58%, rgba(240,138,36,.65))",
+};
+const heroContent = {
+  position: "relative",
+  color: "#fff",
+  padding: "28px 24px",
+  maxWidth: 560,
+};
+const heroTitle = { fontSize: 32, lineHeight: 1.15, fontWeight: 800 };
+const heroSub = { fontSize: 14, lineHeight: 1.7, marginTop: 10, color: "rgba(255,255,255,.95)" };
 const header = { textAlign: "center", marginBottom: 36 };
 const iconBadge = { fontSize: 40 };
 const title = {
@@ -241,6 +302,22 @@ const title = {
   marginTop: 8,
 };
 const sub = { fontSize: 15, color: "var(--text-secondary)", marginTop: 4 };
+const whatsappBtn = {
+  width: "100%",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: 10,
+  background: "#20b15a",
+  color: "#fff",
+  padding: "14px 16px",
+  borderRadius: "var(--radius-sm)",
+  fontSize: 15,
+  fontWeight: 700,
+  marginBottom: 16,
+  boxShadow: "var(--shadow-sm)",
+};
+const whatsappIcon = { display: "inline-flex", alignItems: "center", justifyContent: "center" };
 const formCard = {
   background: "var(--bg-card)",
   borderRadius: "var(--radius)",

@@ -1,37 +1,52 @@
 "use client";
 
 import Link from "next/link";
+import { FileBadge2, FileText, IdCard, MessageCircle, ReceiptText, ShieldCheck } from "lucide-react";
 import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
 
 const services = [
   {
-    icon: "🏠",
+    icon: FileText,
     title: "Rent Agreement",
-    desc: "Create legally valid rental agreements for residential or commercial properties. Select your city and fill landlord/tenant details.",
+    desc: "Create legally valid rental agreements with landlord, tenant and property details.",
     href: "/services/rent-agreement",
-    color: "#6C63FF",
+    color: "#1f8a4c",
   },
   {
-    icon: "📜",
+    icon: ShieldCheck,
+    title: "Police Verification",
+    desc: "Apply for tenant, employee or personal police verification in a guided flow.",
+    href: "/services/police-verification",
+    color: "#f08a24",
+  },
+  {
+    icon: FileBadge2,
     title: "Domicile Certificate",
-    desc: "Apply for a domicile / residence certificate proving you are a resident of a particular state. Required for admissions, jobs, etc.",
+    desc: "Apply for domicile certificate with guided details and support.",
     href: "/services/domicile",
-    color: "#FF6584",
+    color: "#0ea5a4",
   },
   {
-    icon: "💍",
-    title: "Marriage Certificate",
-    desc: "Register your marriage officially and receive your marriage certificate. Required for passport, visa, and legal proceedings.",
-    href: "/services/marriage-certificate",
-    color: "#10b981",
+    icon: ReceiptText,
+    title: "Challan Settlement",
+    desc: "Resolve pending challans with simple document sharing and support.",
+    href: "/services/challan-settlement",
+    color: "#9333ea",
   },
   {
-    icon: "✅",
+    icon: IdCard,
+    title: "RTO Work",
+    desc: "Fitness, license issues, and RTO-related requests handled in one flow.",
+    href: "/services/rto-work",
+    color: "#ea580c",
+  },
+  {
+    icon: ShieldCheck,
     title: "Character Certificate",
-    desc: "Obtain a character / police verification certificate. Needed for employment, higher studies, and government applications.",
+    desc: "Apply for character certificate and police clearance support.",
     href: "/services/character-certificate",
-    color: "#f59e0b",
+    color: "#0891b2",
   },
 ];
 
@@ -39,21 +54,24 @@ export default function ServicesPage() {
   return (
     <div>
       <Navbar />
-      <section style={wrapper}>
+      <section style={wrapper} className="emblem-panel">
         <div style={{ textAlign: "center", marginBottom: 48 }}>
           <h1 style={heading}>Our Document Services</h1>
-          <p style={sub}>Choose a service below to begin your application</p>
+          <p style={sub}>Choose a service below to begin your application in minutes</p>
         </div>
         <div style={grid}>
           {services.map((s) => (
             <Link key={s.href} href={s.href} style={{ textDecoration: "none" }}>
-              <div style={card} className="service-card">
+              <div style={card} className="service-card tile-emblem heritage-corner">
                 <div style={{ ...iconBox, background: s.color + "15", color: s.color }}>
-                  <span style={{ fontSize: 36 }}>{s.icon}</span>
+                  <s.icon size={30} strokeWidth={2.2} />
                 </div>
                 <h3 style={{ fontSize: 20, fontWeight: 700, color: "var(--text)", marginBottom: 8 }}>{s.title}</h3>
                 <p style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.7 }}>{s.desc}</p>
-                <span style={applyBtn}>Apply Now →</span>
+                <span style={applyBtn}>
+                  <MessageCircle size={15} strokeWidth={2.3} />
+                  Chat with us
+                </span>
               </div>
             </Link>
           ))}
@@ -86,5 +104,5 @@ const iconBox = {
   marginBottom: 20,
 };
 const applyBtn = {
-  display: "inline-block", marginTop: 18, fontSize: 15, fontWeight: 700, color: "var(--primary)",
+  display: "inline-flex", alignItems: "center", gap: 7, marginTop: 18, fontSize: 15, fontWeight: 700, color: "var(--primary)",
 };
