@@ -1,13 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { FileText, MessageCircle } from "lucide-react";
 import Navbar from "../../../components/Navbar/Navbar";
 import Footer from "../../../components/Footer/Footer";
 import FormField from "../../../components/FormField/FormField";
 import SubmitButton from "../../../components/SubmitButton/SubmitButton";
+import PostSubmitNoticeModal from "../../../components/PostSubmitNoticeModal/PostSubmitNoticeModal";
 import STATES_AND_CITIES from "../../../data/indianStatesAndCities";
+import { buildShortLeadWhatsAppMessage } from "../../../lib/whatsappLeadMessage";
 
 const initialState = {
   landlordName: "",
@@ -29,6 +31,8 @@ const initialState = {
 export default function RentAgreementPage() {
   const [form, setForm] = useState(initialState);
   const [loading, setLoading] = useState(false);
+  const [noticeOpen, setNoticeOpen] = useState(false);
+  const nextAfterNoticeRef = useRef(null);
   const router = useRouter();
 
   const handle = (e) => {
@@ -51,21 +55,21 @@ export default function RentAgreementPage() {
       });
       const data = await res.json();
       if (data.success) {
-        const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "919336552858";
-        const message = [
-          "New Kaamzy inquiry: Rent Agreement",
-          `Lead ID: ${data.id}`,
-          `Landlord: ${form.landlordName} (${form.landlordPhone})`,
-          `Tenant: ${form.tenantName} (${form.tenantPhone})`,
-          `Location: ${form.city}, ${form.state}`,
-          `Rent: INR ${form.monthlyRent}`,
-          `Start Date: ${form.agreementStartDate || "Not shared"}`,
-        ].join("\n");
+        nextAfterNoticeRef.current = () => {
+          const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "919336552858";
+          const message = buildShortLeadWhatsAppMessage({
+            name: form.tenantName,
+            phone: form.tenantPhone,
+            serviceLabel: "Rent Agreement",
+            urgency: "Not specified",
+          });
 
-        window.location.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-        setTimeout(() => {
-          router.push(`/success?service=Rent Agreement&id=${data.id}`);
-        }, 1200);
+          window.location.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+          setTimeout(() => {
+            router.push(`/success?service=Rent Agreement&id=${data.id}`);
+          }, 1200);
+        };
+        setNoticeOpen(true);
       } else {
         alert(data.error || "Something went wrong");
       }
@@ -130,9 +134,9 @@ export default function RentAgreementPage() {
           {/* Tenant */}
           <h2 style={sectionHead}>Tenant Details</h2>
           <div style={grid}>
-            <FormField label="Full Name" name="tenantName" value={form.tenantName} onChange={handle} placeholder="Tenant full name" />
-            <FormField label="Phone Number" name="tenantPhone" type="tel" value={form.tenantPhone} onChange={handle} placeholder="10-digit phone" />
-            <FormField label="Email" name="tenantEmail" type="email" value={form.tenantEmail} onChange={handle} placeholder="email@example.com" />
+            <FormField label="Full Name" name="tenantName" value={form.tenantName} onChange={handle} placeholder="Tenant full name" required />
+            <FormField label="Phone Number" name="tenantPhone" type="tel" value={form.tenantPhone} onChange={handle} placeholder="10-digit phone" required />
+            <FormField label="Email" name="tenantEmail" type="email" value={form.tenantEmail} onChange={handle} placeholder="email@example.com" required />
           </div>
 
           {/* Property */}
@@ -147,7 +151,7 @@ export default function RentAgreementPage() {
             <FormField label="Duration (months)" name="agreementDuration" type="number" value={form.agreementDuration} onChange={handle} placeholder="e.g. 11" />
           </div>
           <div style={{ marginTop: 16 }}>
-            <FormField label="Special Terms / Conditions" name="specialTerms" type="textarea" value={form.specialTerms} onChange={handle} placeholder="Any additional terms…" required={false} rows={3} />
+            <FormField label="Special Terms / Conditions" name="specialTerms" type="textarea" value={form.specialTerms} onChange={handle} placeholder="Any additional terms…" rows={3} />
           </div>
 
           <div style={{ marginTop: 28 }}>
@@ -156,6 +160,14 @@ export default function RentAgreementPage() {
         </form>
       </div>
       <Footer />
+      <PostSubmitNoticeModal
+        open={noticeOpen}
+        onContinue={() => {
+          setNoticeOpen(false);
+          nextAfterNoticeRef.current?.();
+          nextAfterNoticeRef.current = null;
+        }}
+      />
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );

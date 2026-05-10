@@ -1,13 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { MessageCircle } from "lucide-react";
 import Navbar from "../../../components/Navbar/Navbar";
 import Footer from "../../../components/Footer/Footer";
 import FormField from "../../../components/FormField/FormField";
 import SubmitButton from "../../../components/SubmitButton/SubmitButton";
+import PostSubmitNoticeModal from "../../../components/PostSubmitNoticeModal/PostSubmitNoticeModal";
 import STATES_AND_CITIES from "../../../data/indianStatesAndCities";
+import { buildShortLeadWhatsAppMessage } from "../../../lib/whatsappLeadMessage";
 
 const initialState = {
   husbandName: "",
@@ -31,6 +33,8 @@ const initialState = {
 export default function MarriageCertificatePage() {
   const [form, setForm] = useState(initialState);
   const [loading, setLoading] = useState(false);
+  const [noticeOpen, setNoticeOpen] = useState(false);
+  const nextAfterNoticeRef = useRef(null);
   const router = useRouter();
 
   const handle = (e) => {
@@ -53,7 +57,20 @@ export default function MarriageCertificatePage() {
       });
       const data = await res.json();
       if (data.success) {
-        router.push(`/success?service=Marriage Certificate&id=${data.id}`);
+        nextAfterNoticeRef.current = () => {
+          const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "919336552858";
+          const message = buildShortLeadWhatsAppMessage({
+            name: form.husbandName,
+            phone: form.husbandPhone,
+            serviceLabel: "Marriage Certificate",
+            urgency: form.remarks?.trim() || "Not specified",
+          });
+          window.location.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+          setTimeout(() => {
+            router.push(`/success?service=Marriage Certificate&id=${data.id}`);
+          }, 1200);
+        };
+        setNoticeOpen(true);
       } else {
         alert(data.error || "Something went wrong");
       }
@@ -114,6 +131,7 @@ export default function MarriageCertificatePage() {
               value={form.husbandName}
               onChange={handle}
               placeholder="Husband's full name"
+              required
             />
             <FormField
               label="Date of Birth"
@@ -129,6 +147,7 @@ export default function MarriageCertificatePage() {
               value={form.husbandPhone}
               onChange={handle}
               placeholder="10-digit phone"
+              required
             />
             <FormField
               label="Email"
@@ -137,6 +156,7 @@ export default function MarriageCertificatePage() {
               value={form.husbandEmail}
               onChange={handle}
               placeholder="email@example.com"
+              required
             />
             <FormField
               label="Aadhar Number"
@@ -242,7 +262,6 @@ export default function MarriageCertificatePage() {
               value={form.remarks}
               onChange={handle}
               placeholder="Any additional notes…"
-              required={false}
               rows={3}
             />
           </div>
@@ -256,6 +275,14 @@ export default function MarriageCertificatePage() {
         </form>
       </div>
       <Footer />
+      <PostSubmitNoticeModal
+        open={noticeOpen}
+        onContinue={() => {
+          setNoticeOpen(false);
+          nextAfterNoticeRef.current?.();
+          nextAfterNoticeRef.current = null;
+        }}
+      />
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );

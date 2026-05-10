@@ -3,7 +3,7 @@
 /**
  * Reusable form field component – handles text, select, textarea, date, email, number
  */
-export default function FormField({ label, name, type = "text", value, onChange, options, placeholder, required = true, rows }) {
+export default function FormField({ label, name, type = "text", value, onChange, options, placeholder, required = false, rows }) {
   const id = `field-${name}`;
 
   const baseInput = {

@@ -1,13 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { MessageCircle } from "lucide-react";
 import Navbar from "../../../components/Navbar/Navbar";
 import Footer from "../../../components/Footer/Footer";
 import FormField from "../../../components/FormField/FormField";
 import SubmitButton from "../../../components/SubmitButton/SubmitButton";
+import PostSubmitNoticeModal from "../../../components/PostSubmitNoticeModal/PostSubmitNoticeModal";
 import STATES_AND_CITIES from "../../../data/indianStatesAndCities";
+import { buildShortLeadWhatsAppMessage } from "../../../lib/whatsappLeadMessage";
 
 const initialState = {
   fullName: "",
@@ -29,6 +31,8 @@ const initialState = {
 export default function DomicilePage() {
   const [form, setForm] = useState(initialState);
   const [loading, setLoading] = useState(false);
+  const [noticeOpen, setNoticeOpen] = useState(false);
+  const nextAfterNoticeRef = useRef(null);
   const router = useRouter();
 
   const handle = (e) => {
@@ -51,7 +55,20 @@ export default function DomicilePage() {
       });
       const data = await res.json();
       if (data.success) {
-        router.push(`/success?service=Domicile Certificate&id=${data.id}`);
+        nextAfterNoticeRef.current = () => {
+          const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "919336552858";
+          const message = buildShortLeadWhatsAppMessage({
+            name: form.fullName,
+            phone: form.phone,
+            serviceLabel: "Domicile Certificate",
+            urgency: "Not specified",
+          });
+          window.location.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+          setTimeout(() => {
+            router.push(`/success?service=Domicile Certificate&id=${data.id}`);
+          }, 1200);
+        };
+        setNoticeOpen(true);
       } else {
         alert(data.error || "Something went wrong");
       }
@@ -104,13 +121,13 @@ export default function DomicilePage() {
         <form onSubmit={submit} style={formCard} className="heritage-form-center">
           <h2 style={sectionHead}>Personal Details</h2>
           <div style={grid}>
-            <FormField label="Full Name" name="fullName" value={form.fullName} onChange={handle} placeholder="As per Aadhar" />
+            <FormField label="Full Name" name="fullName" value={form.fullName} onChange={handle} placeholder="As per Aadhar" required />
             <FormField label="Father's Name" name="fatherName" value={form.fatherName} onChange={handle} placeholder="Father's full name" />
             <FormField label="Mother's Name" name="motherName" value={form.motherName} onChange={handle} placeholder="Mother's full name" />
             <FormField label="Date of Birth" name="dob" type="date" value={form.dob} onChange={handle} />
             <FormField label="Gender" name="gender" type="select" value={form.gender} onChange={handle} options={["Male", "Female", "Other"]} placeholder="Select Gender" />
-            <FormField label="Phone" name="phone" type="tel" value={form.phone} onChange={handle} placeholder="10-digit phone" />
-            <FormField label="Email" name="email" type="email" value={form.email} onChange={handle} placeholder="email@example.com" />
+            <FormField label="Phone" name="phone" type="tel" value={form.phone} onChange={handle} placeholder="10-digit phone" required />
+            <FormField label="Email" name="email" type="email" value={form.email} onChange={handle} placeholder="email@example.com" required />
             <FormField label="Aadhar Number" name="aadharNumber" value={form.aadharNumber} onChange={handle} placeholder="12-digit Aadhar" />
           </div>
 
@@ -132,6 +149,14 @@ export default function DomicilePage() {
         </form>
       </div>
       <Footer />
+      <PostSubmitNoticeModal
+        open={noticeOpen}
+        onContinue={() => {
+          setNoticeOpen(false);
+          nextAfterNoticeRef.current?.();
+          nextAfterNoticeRef.current = null;
+        }}
+      />
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );

@@ -1,13 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { MessageCircle, ReceiptText } from "lucide-react";
 import Navbar from "../../../components/Navbar/Navbar";
 import Footer from "../../../components/Footer/Footer";
 import FormField from "../../../components/FormField/FormField";
 import SubmitButton from "../../../components/SubmitButton/SubmitButton";
+import PostSubmitNoticeModal from "../../../components/PostSubmitNoticeModal/PostSubmitNoticeModal";
 import STATES_AND_CITIES from "../../../data/indianStatesAndCities";
+import { buildShortLeadWhatsAppMessage } from "../../../lib/whatsappLeadMessage";
 
 const initialState = {
   fullName: "",
@@ -25,6 +27,8 @@ const initialState = {
 export default function ChallanSettlementPage() {
   const [form, setForm] = useState(initialState);
   const [loading, setLoading] = useState(false);
+  const [noticeOpen, setNoticeOpen] = useState(false);
+  const nextAfterNoticeRef = useRef(null);
   const router = useRouter();
 
   const handle = (e) => {
@@ -47,20 +51,20 @@ export default function ChallanSettlementPage() {
       });
       const data = await res.json();
       if (data.success) {
-        const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "919336552858";
-        const message = [
-          "New KaamZy inquiry: Challan Settlement",
-          `Lead ID: ${data.id}`,
-          `Name: ${form.fullName}`,
-          `Phone: ${form.phone}`,
-          `Vehicle: ${form.vehicleNumber}`,
-          `Challan: ${form.challanNumber}`,
-          `Amount: INR ${form.challanAmount}`,
-        ].join("\n");
-        window.location.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-        setTimeout(() => {
-          router.push(`/success?service=Challan Settlement&id=${data.id}`);
-        }, 1200);
+        nextAfterNoticeRef.current = () => {
+          const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "919336552858";
+          const message = buildShortLeadWhatsAppMessage({
+            name: form.fullName,
+            phone: form.phone,
+            serviceLabel: "Challan Settlement",
+            urgency: form.issueType || "Not specified",
+          });
+          window.location.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+          setTimeout(() => {
+            router.push(`/success?service=Challan Settlement&id=${data.id}`);
+          }, 1200);
+        };
+        setNoticeOpen(true);
       } else {
         alert(data.error || "Something went wrong");
       }
@@ -111,9 +115,9 @@ export default function ChallanSettlementPage() {
         <form onSubmit={submit} style={formCard} className="heritage-form-center">
           <h2 style={sectionHead}>Basic Details</h2>
           <div style={grid}>
-            <FormField label="Full Name" name="fullName" value={form.fullName} onChange={handle} placeholder="Your name" />
-            <FormField label="Phone" name="phone" type="tel" value={form.phone} onChange={handle} placeholder="10-digit number" />
-            <FormField label="Email" name="email" type="email" value={form.email} onChange={handle} placeholder="email@example.com" required={false} />
+            <FormField label="Full Name" name="fullName" value={form.fullName} onChange={handle} placeholder="Your name" required />
+            <FormField label="Phone" name="phone" type="tel" value={form.phone} onChange={handle} placeholder="10-digit number" required />
+            <FormField label="Email" name="email" type="email" value={form.email} onChange={handle} placeholder="email@example.com" required />
             <FormField label="State" name="state" type="select" value={form.state} onChange={handle} options={Object.keys(STATES_AND_CITIES)} placeholder="Select state" />
             <FormField label="City" name="city" type="select" value={form.city} onChange={handle} options={form.state ? STATES_AND_CITIES[form.state] : []} placeholder="Select city" />
           </div>
@@ -121,12 +125,12 @@ export default function ChallanSettlementPage() {
           <h2 style={sectionHead}>Challan Details</h2>
           <div style={grid}>
             <FormField label="Vehicle Number" name="vehicleNumber" value={form.vehicleNumber} onChange={handle} placeholder="e.g. MH12AB1234" />
-            <FormField label="Challan Number" name="challanNumber" value={form.challanNumber} onChange={handle} placeholder="If available" required={false} />
-            <FormField label="Challan Amount (INR)" name="challanAmount" type="number" value={form.challanAmount} onChange={handle} placeholder="e.g. 1500" required={false} />
+            <FormField label="Challan Number" name="challanNumber" value={form.challanNumber} onChange={handle} placeholder="If available" />
+            <FormField label="Challan Amount (INR)" name="challanAmount" type="number" value={form.challanAmount} onChange={handle} placeholder="e.g. 1500" />
             <FormField label="Issue Type" name="issueType" type="select" value={form.issueType} onChange={handle} options={["Speeding", "Parking", "No Helmet", "Signal Jump", "Other"]} placeholder="Select issue" />
           </div>
           <div style={{ marginTop: 16 }}>
-            <FormField label="Additional Details" name="details" type="textarea" value={form.details} onChange={handle} placeholder="Describe your issue..." required={false} rows={3} />
+            <FormField label="Additional Details" name="details" type="textarea" value={form.details} onChange={handle} placeholder="Describe your issue..." rows={3} />
           </div>
 
           <div style={{ marginTop: 28 }}>
@@ -135,6 +139,14 @@ export default function ChallanSettlementPage() {
         </form>
       </div>
       <Footer />
+      <PostSubmitNoticeModal
+        open={noticeOpen}
+        onContinue={() => {
+          setNoticeOpen(false);
+          nextAfterNoticeRef.current?.();
+          nextAfterNoticeRef.current = null;
+        }}
+      />
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );

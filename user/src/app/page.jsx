@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { FileBadge2, FileText, IdCard, MessageCircle, ReceiptText, ShieldCheck, Star } from "lucide-react";
+import { FileBadge2, FileText, IdCard, Info, MessageCircle, ReceiptText, ShieldCheck, Star } from "lucide-react";
 import Navbar from "../components/Navbar/Navbar";
 import Footer from "../components/Footer/Footer";
+import { buildShortLeadWhatsAppMessage } from "../lib/whatsappLeadMessage";
 
 const services = [
   {
@@ -152,6 +153,8 @@ export default function Home() {
   const [openFaqIndex, setOpenFaqIndex] = useState(0);
   const [chatForm, setChatForm] = useState({
     name: "",
+    email: "",
+    phone: "",
     service: "Rent Agreement",
     priority: "Normal",
   });
@@ -196,15 +199,30 @@ export default function Home() {
     setChatOpen(true);
   };
 
-  const submitWhatsAppChat = (e) => {
+  const submitWhatsAppChat = async (e) => {
     e.preventDefault();
     const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "919336552858";
-    const message = [
-      "Hi KaamZy team, I need help.",
-      `Name: ${chatForm.name || "Not provided"}`,
-      `Document Type: ${chatForm.service}`,
-      `Priority: ${chatForm.priority}`,
-    ].join("\n");
+    try {
+      await fetch("/api/navbar-whatsapp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: chatForm.name,
+          email: chatForm.email,
+          phone: chatForm.phone,
+          query: chatForm.service,
+          urgency: chatForm.priority,
+        }),
+      });
+    } catch {
+      /* still open WhatsApp */
+    }
+    const message = buildShortLeadWhatsAppMessage({
+      name: chatForm.name,
+      phone: chatForm.phone,
+      serviceLabel: chatForm.service,
+      urgency: chatForm.priority,
+    });
     window.open(
       `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`,
       "_blank"
@@ -373,6 +391,30 @@ export default function Home() {
                 />
               </label>
               <label style={modalLabel}>
+                Phone
+                <input
+                  style={modalInput}
+                  type="tel"
+                  inputMode="tel"
+                  value={chatForm.phone}
+                  onChange={(e) => setChatForm((prev) => ({ ...prev, phone: e.target.value }))}
+                  placeholder="Mobile number"
+                  required
+                />
+              </label>
+              <label style={modalLabel}>
+                Email
+                <input
+                  style={modalInput}
+                  type="email"
+                  autoComplete="email"
+                  value={chatForm.email}
+                  onChange={(e) => setChatForm((prev) => ({ ...prev, email: e.target.value }))}
+                  placeholder="you@example.com"
+                  required
+                />
+              </label>
+              <label style={modalLabel}>
                 Document Type
                 <select
                   style={modalInput}
@@ -389,7 +431,7 @@ export default function Home() {
                 </select>
               </label>
               <div style={modalLabel}>
-                Priority
+                Urgency
                 <div style={priorityRow}>
                   <button
                     type="button"
@@ -420,6 +462,14 @@ export default function Home() {
                 <button type="submit" style={modalSubmitBtn}>
                   Continue to WhatsApp
                 </button>
+              </div>
+              <div style={modalFooterHint} role="note">
+                <span style={modalFooterHintIcon} aria-hidden>
+                  <Info size={16} strokeWidth={2} color="#1e40af" />
+                </span>
+                <span style={modalFooterHintText}>
+                  We will reach out to you on the same details incase you miss to WhatsApp us after you click Continue.
+                </span>
               </div>
             </form>
           </div>
@@ -779,4 +829,24 @@ const modalSubmitBtn = {
   borderRadius: 8,
   padding: "10px 12px",
   fontWeight: 700,
+};
+const modalFooterHint = {
+  display: "flex",
+  alignItems: "flex-start",
+  gap: 8,
+  marginTop: 14,
+  padding: "10px 10px",
+  background: "#eff6ff",
+  borderRadius: 8,
+  border: "1px solid #bfdbfe",
+};
+const modalFooterHintIcon = {
+  flexShrink: 0,
+  display: "inline-flex",
+  marginTop: 1,
+};
+const modalFooterHintText = {
+  fontSize: 12,
+  lineHeight: 1.45,
+  color: "#1e293b",
 };

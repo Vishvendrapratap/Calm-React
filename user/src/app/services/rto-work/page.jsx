@@ -1,13 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { IdCard, MessageCircle } from "lucide-react";
 import Navbar from "../../../components/Navbar/Navbar";
 import Footer from "../../../components/Footer/Footer";
 import FormField from "../../../components/FormField/FormField";
 import SubmitButton from "../../../components/SubmitButton/SubmitButton";
+import PostSubmitNoticeModal from "../../../components/PostSubmitNoticeModal/PostSubmitNoticeModal";
 import STATES_AND_CITIES from "../../../data/indianStatesAndCities";
+import { buildShortLeadWhatsAppMessage } from "../../../lib/whatsappLeadMessage";
 
 const initialState = {
   fullName: "",
@@ -24,6 +26,8 @@ const initialState = {
 export default function RtoWorkPage() {
   const [form, setForm] = useState(initialState);
   const [loading, setLoading] = useState(false);
+  const [noticeOpen, setNoticeOpen] = useState(false);
+  const nextAfterNoticeRef = useRef(null);
   const router = useRouter();
 
   const handle = (e) => {
@@ -46,19 +50,20 @@ export default function RtoWorkPage() {
       });
       const data = await res.json();
       if (data.success) {
-        const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "919336552858";
-        const message = [
-          "New KaamZy inquiry: RTO Work",
-          `Lead ID: ${data.id}`,
-          `Name: ${form.fullName}`,
-          `Phone: ${form.phone}`,
-          `Service Type: ${form.rtoServiceType}`,
-          `Vehicle: ${form.vehicleNumber || "Not provided"}`,
-        ].join("\n");
-        window.location.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-        setTimeout(() => {
-          router.push(`/success?service=RTO Work&id=${data.id}`);
-        }, 1200);
+        nextAfterNoticeRef.current = () => {
+          const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "919336552858";
+          const message = buildShortLeadWhatsAppMessage({
+            name: form.fullName,
+            phone: form.phone,
+            serviceLabel: form.rtoServiceType ? `RTO Work (${form.rtoServiceType})` : "RTO Work",
+            urgency: form.preferredTime || "Not specified",
+          });
+          window.location.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+          setTimeout(() => {
+            router.push(`/success?service=RTO Work&id=${data.id}`);
+          }, 1200);
+        };
+        setNoticeOpen(true);
       } else {
         alert(data.error || "Something went wrong");
       }
@@ -109,16 +114,16 @@ export default function RtoWorkPage() {
         <form onSubmit={submit} style={formCard} className="heritage-form-center">
           <h2 style={sectionHead}>Applicant Details</h2>
           <div style={grid}>
-            <FormField label="Full Name" name="fullName" value={form.fullName} onChange={handle} placeholder="Your name" />
-            <FormField label="Phone" name="phone" type="tel" value={form.phone} onChange={handle} placeholder="10-digit number" />
-            <FormField label="Email" name="email" type="email" value={form.email} onChange={handle} placeholder="email@example.com" required={false} />
+            <FormField label="Full Name" name="fullName" value={form.fullName} onChange={handle} placeholder="Your name" required />
+            <FormField label="Phone" name="phone" type="tel" value={form.phone} onChange={handle} placeholder="10-digit number" required />
+            <FormField label="Email" name="email" type="email" value={form.email} onChange={handle} placeholder="email@example.com" required />
             <FormField label="State" name="state" type="select" value={form.state} onChange={handle} options={Object.keys(STATES_AND_CITIES)} placeholder="Select state" />
             <FormField label="City" name="city" type="select" value={form.city} onChange={handle} options={form.state ? STATES_AND_CITIES[form.state] : []} placeholder="Select city" />
           </div>
 
           <h2 style={sectionHead}>RTO Request</h2>
           <div style={grid}>
-            <FormField label="Vehicle Number" name="vehicleNumber" value={form.vehicleNumber} onChange={handle} placeholder="e.g. MH12AB1234" required={false} />
+            <FormField label="Vehicle Number" name="vehicleNumber" value={form.vehicleNumber} onChange={handle} placeholder="e.g. MH12AB1234" />
             <FormField
               label="Service Type"
               name="rtoServiceType"
@@ -128,7 +133,7 @@ export default function RtoWorkPage() {
               options={["Fitness Renewal", "License Issue", "RC Transfer", "NOC", "Duplicate RC/License", "Other"]}
               placeholder="Select service type"
             />
-            <FormField label="Preferred Call Time" name="preferredTime" value={form.preferredTime} onChange={handle} placeholder="e.g. 6 PM - 8 PM" required={false} />
+            <FormField label="Preferred Call Time" name="preferredTime" value={form.preferredTime} onChange={handle} placeholder="e.g. 6 PM - 8 PM" />
           </div>
           <div style={{ marginTop: 16 }}>
             <FormField label="Issue Summary" name="issueSummary" type="textarea" value={form.issueSummary} onChange={handle} placeholder="Describe what help you need..." rows={3} />
@@ -140,6 +145,14 @@ export default function RtoWorkPage() {
         </form>
       </div>
       <Footer />
+      <PostSubmitNoticeModal
+        open={noticeOpen}
+        onContinue={() => {
+          setNoticeOpen(false);
+          nextAfterNoticeRef.current?.();
+          nextAfterNoticeRef.current = null;
+        }}
+      />
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );

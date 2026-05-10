@@ -1,13 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { MessageCircle, ShieldCheck } from "lucide-react";
 import Navbar from "../../../components/Navbar/Navbar";
 import Footer from "../../../components/Footer/Footer";
 import FormField from "../../../components/FormField/FormField";
 import SubmitButton from "../../../components/SubmitButton/SubmitButton";
+import PostSubmitNoticeModal from "../../../components/PostSubmitNoticeModal/PostSubmitNoticeModal";
 import STATES_AND_CITIES from "../../../data/indianStatesAndCities";
+import { buildShortLeadWhatsAppMessage } from "../../../lib/whatsappLeadMessage";
 
 const initialState = {
   applicantName: "",
@@ -24,6 +26,8 @@ const initialState = {
 export default function PoliceVerificationPage() {
   const [form, setForm] = useState(initialState);
   const [loading, setLoading] = useState(false);
+  const [noticeOpen, setNoticeOpen] = useState(false);
+  const nextAfterNoticeRef = useRef(null);
   const router = useRouter();
 
   const handle = (e) => {
@@ -47,21 +51,23 @@ export default function PoliceVerificationPage() {
       const data = await res.json();
 
       if (data.success) {
-        const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "919336552858";
-        const message = [
-          "New Kaamzy inquiry: Police Verification",
-          `Lead ID: ${data.id}`,
-          `Name: ${form.applicantName}`,
-          `Phone: ${form.phone}`,
-          `Type: ${form.verificationType}`,
-          `Purpose: ${form.purpose}`,
-          `Location: ${form.city}, ${form.state}`,
-        ].join("\n");
+        nextAfterNoticeRef.current = () => {
+          const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "919336552858";
+          const message = buildShortLeadWhatsAppMessage({
+            name: form.applicantName,
+            phone: form.phone,
+            serviceLabel: form.verificationType
+              ? `Police Verification (${form.verificationType})`
+              : "Police Verification",
+            urgency: form.preferredCallTime || "Not specified",
+          });
 
-        window.location.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-        setTimeout(() => {
-          router.push(`/success?service=Police Verification&id=${data.id}`);
-        }, 1200);
+          window.location.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+          setTimeout(() => {
+            router.push(`/success?service=Police Verification&id=${data.id}`);
+          }, 1200);
+        };
+        setNoticeOpen(true);
       } else {
         alert(data.error || "Something went wrong");
       }
@@ -117,9 +123,9 @@ export default function PoliceVerificationPage() {
         <form onSubmit={submit} style={formCard} className="heritage-form-center">
           <h2 style={sectionHead}>Applicant Details</h2>
           <div style={grid}>
-            <FormField label="Full Name" name="applicantName" value={form.applicantName} onChange={handle} placeholder="Your full name" />
-            <FormField label="Phone Number" name="phone" type="tel" value={form.phone} onChange={handle} placeholder="10-digit number" />
-            <FormField label="Email" name="email" type="email" value={form.email} onChange={handle} placeholder="email@example.com" required={false} />
+            <FormField label="Full Name" name="applicantName" value={form.applicantName} onChange={handle} placeholder="Your full name" required />
+            <FormField label="Phone Number" name="phone" type="tel" value={form.phone} onChange={handle} placeholder="10-digit number" required />
+            <FormField label="Email" name="email" type="email" value={form.email} onChange={handle} placeholder="email@example.com" required />
             <FormField
               label="Verification Type"
               name="verificationType"
@@ -135,7 +141,7 @@ export default function PoliceVerificationPage() {
           <div style={grid}>
             <FormField label="State" name="state" type="select" value={form.state} onChange={handle} options={Object.keys(STATES_AND_CITIES)} placeholder="Select state" />
             <FormField label="City" name="city" type="select" value={form.city} onChange={handle} options={form.state ? STATES_AND_CITIES[form.state] : []} placeholder="Select city" />
-            <FormField label="Preferred Call Time" name="preferredCallTime" value={form.preferredCallTime} onChange={handle} placeholder="e.g. 5 PM - 7 PM" required={false} />
+            <FormField label="Preferred Call Time" name="preferredCallTime" value={form.preferredCallTime} onChange={handle} placeholder="e.g. 5 PM - 7 PM" />
           </div>
 
           <div style={{ marginTop: 16 }}>
@@ -151,6 +157,14 @@ export default function PoliceVerificationPage() {
         </form>
       </div>
       <Footer />
+      <PostSubmitNoticeModal
+        open={noticeOpen}
+        onContinue={() => {
+          setNoticeOpen(false);
+          nextAfterNoticeRef.current?.();
+          nextAfterNoticeRef.current = null;
+        }}
+      />
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );

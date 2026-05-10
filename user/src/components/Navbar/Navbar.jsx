@@ -11,6 +11,11 @@ export default function Navbar() {
     { href: "/services", label: "Services" },
   ];
 
+  const openWhatsAppChat = (e) => {
+    e.preventDefault();
+    window.location.href = "/?chat=1";
+  };
+
   return (
     <header style={styles.header}>
       <div style={styles.inner}>
@@ -36,13 +41,10 @@ export default function Navbar() {
           ))}
         </nav>
 
-        <Link
-          href="/?chat=1"
-          style={styles.cta}
-        >
+        <a href="/?chat=1" onClick={openWhatsAppChat} style={styles.cta}>
           <MessageCircle size={16} strokeWidth={2.4} />
           WhatsApp
-        </Link>
+        </a>
       </div>
     </header>
   );

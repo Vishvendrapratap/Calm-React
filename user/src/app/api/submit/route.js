@@ -1,14 +1,29 @@
 import { NextResponse } from "next/server";
-import * as XLSX from "xlsx";
-import path from "path";
-import fs from "fs";
+import {
+  appendToGoogleAppsScript,
+  normalizeBlankFields,
+  saveToLocalXlsx,
+} from "../../../lib/saveSubmission";
+import { buildSheetSummary } from "../../../lib/sheetLeadSummary";
 
-const DATA_DIR = path.join(process.cwd(), "data");
+/** Name + phone + email (tenant/husband variants where applicable). */
+const CONTACT_TRIO_KEYS = {
+  "rto-work": ["fullName", "phone", "email"],
+  "rent-agreement": ["tenantName", "tenantPhone", "tenantEmail"],
+  "police-verification": ["applicantName", "phone", "email"],
+  "challan-settlement": ["fullName", "phone", "email"],
+  "domicile-certificate": ["fullName", "phone", "email"],
+  "character-certificate": ["fullName", "phone", "email"],
+  "marriage-certificate": ["husbandName", "husbandPhone", "husbandEmail"],
+};
 
-function ensureDir() {
-  if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
-  }
+function missingContactFields(serviceType, formData) {
+  const keys = CONTACT_TRIO_KEYS[serviceType];
+  if (!keys) return ["serviceType"];
+  return keys.filter((k) => {
+    const v = formData[k];
+    return v === undefined || v === null || String(v).trim() === "";
+  });
 }
 
 export async function POST(request) {
@@ -20,58 +35,47 @@ export async function POST(request) {
       return NextResponse.json({ error: "serviceType is required" }, { status: 400 });
     }
 
-    ensureDir();
-
-    const fileName = `${serviceType}.xlsx`;
-    const filePath = path.join(DATA_DIR, fileName);
-
-    let workbook;
-    let rows = [];
-
-    // If file exists, read existing data
-    if (fs.existsSync(filePath)) {
-      const fileBuffer = fs.readFileSync(filePath);
-      workbook = XLSX.read(fileBuffer, { type: "buffer" });
-      const sheet = workbook.Sheets[workbook.SheetNames[0]];
-      rows = XLSX.utils.sheet_to_json(sheet);
-    } else {
-      workbook = XLSX.utils.book_new();
+    const missing = missingContactFields(serviceType, formData);
+    if (missing.length) {
+      return NextResponse.json(
+        {
+          error:
+            missing[0] === "serviceType"
+              ? "Unsupported service type"
+              : `Required: name, phone, and email for this form (${missing.join(", ")})`,
+        },
+        { status: 400 }
+      );
     }
 
-    // Add timestamp and ID
-    const newRow = {
-      ID: rows.length + 1,
-      SubmittedAt: new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }),
-      ...formData,
-    };
+    const { id, fileName } = saveToLocalXlsx(serviceType, formData);
 
-    rows.push(newRow);
-
-    // Create new sheet from updated rows
-    const newSheet = XLSX.utils.json_to_sheet(rows);
-
-    // Auto-size columns
-    const colWidths = Object.keys(newRow).map((key) => ({
-      wch: Math.max(key.length, String(newRow[key] || "").length) + 4,
-    }));
-    newSheet["!cols"] = colWidths;
-
-    // Replace or add sheet
-    if (workbook.SheetNames.length > 0) {
-      workbook.Sheets[workbook.SheetNames[0]] = newSheet;
-    } else {
-      XLSX.utils.book_append_sheet(workbook, newSheet, "Applications");
+    let googleSync = "skipped";
+    try {
+      const submittedAtIso = new Date().toISOString();
+      await appendToGoogleAppsScript({
+        ...normalizeBlankFields(body),
+        ...buildSheetSummary(body, {
+          leadId: id,
+          submittedAtIso,
+          source: "service-form",
+        }),
+        source: "service-form",
+        leadId: id,
+        submittedAtIso,
+      });
+      googleSync = process.env.GOOGLE_APPS_SCRIPT_INQUIRY_URL ? "ok" : "skipped";
+    } catch (err) {
+      console.error("Google Sheet service-form sync failed:", err);
+      googleSync = "failed";
     }
-
-    // Write file
-    const buffer = XLSX.write(workbook, { type: "buffer", bookType: "xlsx" });
-    fs.writeFileSync(filePath, buffer);
 
     return NextResponse.json({
       success: true,
       message: "Application submitted successfully!",
-      id: newRow.ID,
+      id,
       file: fileName,
+      googleSync,
     });
   } catch (err) {
     console.error("Excel save error:", err);

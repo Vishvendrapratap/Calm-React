@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import PostSubmitNoticeModal from "../../components/PostSubmitNoticeModal/PostSubmitNoticeModal";
 import "./raise-inquiry.css";
 
 export default function RaiseInquiryPage() {
@@ -17,6 +18,9 @@ export default function RaiseInquiryPage() {
     file: null,
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [noticeOpen, setNoticeOpen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -26,10 +30,36 @@ export default function RaiseInquiryPage() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitted(true);
-    // In a real app, you would send this to your backend API
+    setSubmitError("");
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/inquiry", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fullName: formData.fullName,
+          email: formData.email,
+          phone: formData.phone,
+          documentType: formData.documentType,
+          priority: formData.priority,
+          description: formData.description,
+          expectedDate: formData.expectedDate,
+          attachmentFileName: formData.file?.name || "",
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setSubmitError(data.error || "Could not submit. Please try again.");
+        return;
+      }
+      setNoticeOpen(true);
+    } catch {
+      setSubmitError("Network error. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (isSubmitted) {
@@ -43,8 +73,8 @@ export default function RaiseInquiryPage() {
             get back to you within 24-48 hours.
           </p>
           <p className="contact-info">
-            A confirmation email has been sent to{" "}
-            <strong>{formData.email}</strong>
+            We will contact you at <strong>{formData.email}</strong> if we need
+            more details.
           </p>
           <div className="success-actions">
             <button onClick={() => router.push("/")} className="home-btn">
@@ -53,6 +83,8 @@ export default function RaiseInquiryPage() {
             <button
               onClick={() => {
                 setIsSubmitted(false);
+                setNoticeOpen(false);
+                setSubmitError("");
                 setFormData({
                   fullName: "",
                   email: "",
@@ -154,14 +186,11 @@ export default function RaiseInquiryPage() {
             <h3>Inquiry Details</h3>
             <div className="form-grid">
               <div className="field-row">
-                <label>
-                  Service Type <span className="required">*</span>
-                </label>
+                <label>Service Type</label>
                 <select
                   name="documentType"
                   value={formData.documentType}
                   onChange={handleChange}
-                  required
                 >
                   <option value="">Select a service type</option>
                   <option value="Passport">Passport Services</option>
@@ -197,16 +226,13 @@ export default function RaiseInquiryPage() {
               </div>
 
               <div className="field-row full-width">
-                <label>
-                  Description <span className="required">*</span>
-                </label>
+                <label>Description</label>
                 <textarea
                   rows="4"
                   name="description"
                   value={formData.description}
                   onChange={handleChange}
                   placeholder="Please describe your inquiry in detail..."
-                  required
                 />
               </div>
 
@@ -225,9 +251,14 @@ export default function RaiseInquiryPage() {
             </div>
           </div>
 
+          {submitError ? (
+            <p className="form-note" style={{ color: "#b42318", marginBottom: 8 }}>
+              {submitError}
+            </p>
+          ) : null}
           <div className="form-actions">
-            <button type="submit" className="submit-btn">
-              Submit Inquiry
+            <button type="submit" className="submit-btn" disabled={submitting}>
+              {submitting ? "Submitting…" : "Submit Inquiry"}
             </button>
             <p className="form-note">
               Already have an account? <a href="/login">Login</a> to track your
@@ -241,6 +272,14 @@ export default function RaiseInquiryPage() {
       <footer className="inquiry-footer">
         <p>© 2026 Kaamzy. All rights reserved.</p>
       </footer>
+
+      <PostSubmitNoticeModal
+        open={noticeOpen}
+        onContinue={() => {
+          setNoticeOpen(false);
+          setIsSubmitted(true);
+        }}
+      />
     </div>
   );
 }
